@@ -1,0 +1,7 @@
+node_modules/
+.supabase/
+.bolt/
+*.sql
+*.test.tsx
+*.md
+*.log
