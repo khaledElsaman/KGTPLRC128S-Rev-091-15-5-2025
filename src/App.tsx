@@ -28,7 +28,6 @@ import NewVariation from './components/variations/NewVariation';
 import VariationAnalysis from './components/variations/VariationAnalysis';
 import AIVariationPredictions from './components/variations/AIVariationPredictions';
 import VariationApproval from './components/variations/VariationApproval';
-import GtplRC128GuideRegulation from './components/guides/GtplRC128Regulation';
 import GtplRC128LinkedRegulations from './components/guides/GtplRC128LinkedRegulations';
 import GtplRC128Home from './components/guides/GtplRC128Home';
 import DetailedClaims from './components/DetailedClaims';
@@ -48,8 +47,6 @@ import Arbitration from './components/disputes/Arbitration';
 import GtplRC128TableOfContents from './components/knowledge-base/GtplRC128TableOfContents';
 import GtplRC128ArticlesEn from './components/knowledge-base/GtplRC128ArticlesEn';
 import GtplRC128ArticlesAr from './components/knowledge-base/GtplRC128ArticlesAr';
-import GtplRC128RegulationTOC from './components/knowledge-base/GtplRC128RegulationTOC';
-import GtplRC128RegulationViewer from './components/knowledge-base/GtplRC128RegulationViewer';
 import DeploymentStatusPage from './components/DeploymentStatusPage';
 import GdmpVariationModule from './components/knowledge-base/GdmpVariationModule';
 import GdmpClaimsModule from './components/knowledge-base/GdmpClaimsModule';
@@ -144,10 +141,6 @@ function AppContent() {
         return <GtplRC128ArticlesEn />;
       case 'gtpl-rc128-articles-ar':
         return <GtplRC128ArticlesAr />;
-      case 'gtpl-rc128-regulation-toc':
-        return <GtplRC128RegulationTOC />;
-      case 'gtpl-rc128-regulation-viewer':
-        return <GtplRC128RegulationViewer />;
       case 'gtpl-rc128-part-selector':
         return <GtplRC128PartSelector />;
       case 'gtpl-rc128-part-i':
