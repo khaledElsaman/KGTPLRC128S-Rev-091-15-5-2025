@@ -49,7 +49,6 @@ import GtplRC128TableOfContents from './components/knowledge-base/GtplRC128Table
 import GtplRC128ArticlesEn from './components/knowledge-base/GtplRC128ArticlesEn';
 import GtplRC128ArticlesAr from './components/knowledge-base/GtplRC128ArticlesAr';
 import GtplRC128RegulationTOC from './components/knowledge-base/GtplRC128RegulationTOC';
-import GtplRC128RegulationAR from './components/knowledge-base/GtplRC128RegulationAR';
 import GtplRC128RegulationViewer from './components/knowledge-base/GtplRC128RegulationViewer';
 import DeploymentStatusPage from './components/DeploymentStatusPage';
 import GdmpVariationModule from './components/knowledge-base/GdmpVariationModule';
@@ -147,8 +146,6 @@ function AppContent() {
         return <GtplRC128ArticlesAr />;
       case 'gtpl-rc128-regulation-toc':
         return <GtplRC128RegulationTOC />;
-      case 'gtpl-rc128-regulation-ar':
-        return <GtplRC128RegulationAR />;
       case 'gtpl-rc128-regulation-viewer':
         return <GtplRC128RegulationViewer />;
       case 'gtpl-rc128-part-selector':
