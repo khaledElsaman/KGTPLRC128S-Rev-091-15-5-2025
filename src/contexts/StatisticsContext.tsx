@@ -55,43 +55,46 @@ export const useStatistics = () => {
   return context;
 };
 
-export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [statistics, setStatistics] = useState<Statistics>({
-    claims: {
-      total: 0,
-      active: 0,
-      resolved: 0,
-      pending: 0,
-      value: 0,
-      complianceRate: 0,
-      trends: {
-        monthly: 0,
-        weekly: 0
-      }
-    },
-    variations: {
-      total: 0,
-      active: 0,
-      approved: 0,
-      pending: 0,
-      value: 0,
-      approvalRate: 0,
-      trends: {
-        monthly: 0,
-        weekly: 0
-      }
-    },
-    aiAnalysis: {
-      predictions: 156,
-      accuracy: 92,
-      alerts: 12,
-      insights: 45,
-      trends: {
-        accuracy: 3,
-        alerts: -5
-      }
+// Fallback data in case of connection issues
+const fallbackStatistics: Statistics = {
+  claims: {
+    total: 0,
+    active: 0,
+    resolved: 0,
+    pending: 0,
+    value: 0,
+    complianceRate: 0,
+    trends: {
+      monthly: 0,
+      weekly: 0
     }
-  });
+  },
+  variations: {
+    total: 0,
+    active: 0,
+    approved: 0,
+    pending: 0,
+    value: 0,
+    approvalRate: 0,
+    trends: {
+      monthly: 0,
+      weekly: 0
+    }
+  },
+  aiAnalysis: {
+    predictions: 0,
+    accuracy: 0,
+    alerts: 0,
+    insights: 0,
+    trends: {
+      accuracy: 0,
+      alerts: 0
+    }
+  }
+};
+
+export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [statistics, setStatistics] = useState<Statistics>(fallbackStatistics);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -103,7 +106,19 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setIsLoading(true);
         setError(null);
 
-        // Fetch claims statistics
+        // Check Supabase connection first
+        const healthCheck = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/`, {
+          headers: {
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          }
+        });
+
+        if (!healthCheck.ok) {
+          throw new Error(`Supabase health check failed: ${healthCheck.statusText}`);
+        }
+
+        // Fetch claims statistics with explicit error handling
         const { data: claimsData, error: claimsError } = await supabase
           .from('claims_master')
           .select('status, value');
@@ -112,7 +127,7 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           throw new Error(`Failed to fetch claims data: ${claimsError.message}`);
         }
 
-        // Fetch variations statistics
+        // Fetch variations statistics with explicit error handling
         const { data: variationsData, error: variationsError } = await supabase
           .from('variations_master')
           .select('status, value');
@@ -121,13 +136,13 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           throw new Error(`Failed to fetch variations data: ${variationsError.message}`);
         }
 
-        // Calculate statistics
+        // Calculate statistics with null checks
         const claims = {
           total: claimsData?.length || 0,
           active: claimsData?.filter(c => c.status === 'active').length || 0,
           resolved: claimsData?.filter(c => c.status === 'resolved').length || 0,
           pending: claimsData?.filter(c => c.status === 'pending').length || 0,
-          value: claimsData?.reduce((sum, claim) => sum + (claim.value || 0), 0) || 0,
+          value: claimsData?.reduce((sum, claim) => sum + (Number(claim.value) || 0), 0) || 0,
           complianceRate: 94,
           trends: {
             monthly: 15,
@@ -140,7 +155,7 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           active: variationsData?.filter(v => v.status === 'active').length || 0,
           approved: variationsData?.filter(v => v.status === 'approved').length || 0,
           pending: variationsData?.filter(v => v.status === 'pending').length || 0,
-          value: variationsData?.reduce((sum, variation) => sum + (variation.value || 0), 0) || 0,
+          value: variationsData?.reduce((sum, variation) => sum + (Number(variation.value) || 0), 0) || 0,
           approvalRate: 85,
           trends: {
             monthly: 12,
@@ -160,8 +175,9 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         console.error(`Attempt ${attempt + 1} failed:`, err);
         
         if (attempt === retries - 1) {
-          // If this was our last attempt, set the error state
+          // If this was our last attempt, set the error state and use fallback data
           setError(err instanceof Error ? err : new Error('Failed to fetch statistics'));
+          setStatistics(fallbackStatistics);
         } else {
           // If we have more attempts, wait before trying again
           await new Promise(resolve => setTimeout(resolve, delay(attempt)));
